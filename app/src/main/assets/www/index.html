@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Logger</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    select { font-size: 16px; margin-top: 10px; }
+    #log { margin-top: 20px; max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>NFC Logger</h1>
+  <label for="control">Selecciona control:</label>
+  <select id="control">
+    <option>Control 1</option><option>Control 2</option><option>Control 3</option>
+    <option>Control 4</option><option>Control 5</option><option>Control 6</option>
+    <option>Control 7</option><option>Control 8</option><option>Control 9</option>
+    <option>Control 10</option>
+  </select>
+  <div id="log"></div>
+  <script>
+    const log = document.getElementById('log');
+    const control = document.getElementById('control');
+    const logs = [];
+    async function startNFC() {
+      if ('NDEFReader' in window) {
+        try {
+          const reader = new NDEFReader();
+          await reader.scan();
+          reader.onreading = e => {
+            const id = e.serialNumber || "unknown";
+            const timestamp = new Date().toISOString();
+            const ctl = control.value;
+            const line = `${timestamp},${id},${ctl}`;
+            logs.push(line);
+            const p = document.createElement('p');
+            p.textContent = line;
+            log.appendChild(p);
+          };
+        } catch (err) {
+          log.innerText = "NFC error: " + err;
+        }
+      } else {
+        log.innerText = "Web NFC no soportado.";
+      }
+    }
+    startNFC();
+  </script>
+</body>
+</html>
